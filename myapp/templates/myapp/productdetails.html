@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Detail</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .product-images img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .product-description {
+            margin-bottom: 20px;
+        }
+
+        .btn-buy,
+        .btn-add-to-cart {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'myapp/navbar.html' %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{{product_object.image_url_1}}" alt="Product Image 1">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="{{product_object.image_url_2}}" alt="Product Image 2">
+                    </div>
+                    <div class="col-md-4">
+                        <img src="{{product_object.image_url_3}}" alt="Product Image 3">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h1 class="text-center">{{product_object.name}}</h1>
+                
+                <p class="product-description">
+                   {{product_object.description}}
+                </p>
+                <p class="product-price text-center">₹{{product_object.price}}</p>
+                <button class="btn btn-primary btn-buy">Buy Now</button>
+                <button class="btn btn-success btn-add-to-cart">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

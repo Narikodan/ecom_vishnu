@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    {% include 'myapp/navbar.html' %}
+    <div class="container">
+        <h1>Checkout</h1>
+        
+        {% if cart_items %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Cart Items</h5>
+                </div>
+                <div class="card-body">
+                    <div class="cart-items">
+                        {% for cart_item in cart_items %}
+                            <div class="row cart-item">
+                                <div class="col-md-2">
+                                    <img src="{{ cart_item.product.image_url_1 }}" alt="Product Image" class="img-fluid">
+                                </div>
+                                <div class="col-md-3">
+                                    <p>{{ cart_item.product.name }}</p>
+                                </div>
+                                <div class="col-md-2">
+                                    <p>₹{{ cart_item.product.price }}</p>
+                                </div>
+                                <!-- Other cart item details -->
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Shipping Address</h5>
+            </div>
+            <div class="card-body">
+                {% if shipping_address %}
+                    <div id="address-info">
+                        <p><strong> {{ shipping_address.name }}</strong></p>
+                        <p><strong> {{ shipping_address.address }}</strong></p>
+                        <p><strong> {{ shipping_address.city }}</strong></p>
+                        <p><strong> {{ shipping_address.state }}</strong></p>
+                        <p><strong> {{ shipping_address.pin_code }}</strong></p>
+                        <p><strong> {{ shipping_address.phone }}</strong></p>
+                    </div>
+                {% else %}
+                    <p>No shipping address found.</p>
+                {% endif %}
+                <hr>
+                <div class="text-center">
+                    <a type="button" class="btn btn-primary" href="{% url 'myapp:edit_adress' %}">Add/Edit Address</a>
+                </div>
+            </div>
+        </div>
+        
+        <form action="/process_checkout" method="POST">
+            <!-- Your remaining checkout form fields here -->
+            <!-- For example, payment details, order summary, etc. -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Place Order</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

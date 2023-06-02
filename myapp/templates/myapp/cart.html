@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .cart-item {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .cart-item img {
+            max-width: 100px;
+            max-height: 100px;
+        }
+
+        .cart-item .product-name {
+            font-weight: bold;
+        }
+
+        .cart-item .remove-button {
+            background-color: transparent;
+            border: none;
+            color: red;
+            cursor: pointer;
+        }
+
+        .total-amount {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .checkout-button {
+            margin-top: 20px;
+        }
+
+        /* Add space between total section and checkout button */
+        .total-section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'myapp/navbar.html' %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <p class="alert alert-success">{{ message }}</p>
+        {% endfor %}
+    </ul>
+{% endif %}
+    <div class="container">
+        <h1 class="text-center mt-4">Shopping Cart</h1>
+        <div class="cart-items mt-4">
+            {% for cart_item in cart_items %}
+                <div class="row cart-item">
+                    <div class="col-md-2">
+                        <img src="{{ cart_item.product.image_url_1 }}" alt="Product Image" class="img-fluid">
+                    </div>
+                    <div class="col-md-3">
+                        <p>{{ cart_item.product.name }}</p>
+                    </div>
+                    <div class="col-md-2">
+                        <p>₹{{ cart_item.product.price }}</p>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" class="form-control quantity-input" value="{{ cart_item.quantity }}" min="1" data-item-id="{{ cart_item.id }}">
+                    </div>
+                    <div class="col-md-2">
+                        <p>₹{{ cart_item.total_price }}</p>
+                    </div>
+                    <div class="col-md-1">
+                        <form action="{% url 'myapp:delete_cart_item' cart_item.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="remove-button"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="total-section">
+            <p class="total-text">Total:</p>
+            <p class="total-amount" id="total-amount">₹{{ total_amount }}</p>
+        </div> 
+        <div class="total-section">
+            <a class="btn btn-primary checkout-button" href="{% url 'myapp:checkout' %}">Proceed to Checkout</a>
+        </div>
+    </div>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
