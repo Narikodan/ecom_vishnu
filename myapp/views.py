@@ -148,3 +148,13 @@ def edit_adress(request):
         return redirect('myapp:checkout')
 
     return render(request, 'myapp/shippingaddress.html')
+
+@login_required
+def buynow(request, id):
+    product_object = Product.objects.get(id=id)
+    user = request.user
+    try:
+        shipping_address = ShippingAddress.objects.get(user=user)
+    except ShippingAddress.DoesNotExist:
+        return redirect('myapp:edit_adress')
+    return render(request, 'myapp/buynow.html', {'product_object': product_object, 'shipping_address': shipping_address})
