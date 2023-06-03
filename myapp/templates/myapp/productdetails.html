@@ -37,7 +37,11 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary btn-block">Buy Now</button>
                     </form>
-                    <button class="btn btn-success btn-block" data-product-id="{{ product_object.id }}">Add to Cart</button>
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-success btn-block add-to-cart" data-product-id="{{ product_object.id }}">Add to Cart</button>
+                    {% else %}
+                        <a href="{% url 'myapp:login' %}" class="btn btn-success btn-block">Add to Cart</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -46,9 +50,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var addToCartButtons = document.querySelectorAll('.btn-success');
-            addToCartButtons.forEach(function(button) {
-              button.addEventListener('click', function() {
+          var addToCartButtons = document.querySelectorAll('.add-to-cart');
+          addToCartButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+              {% if user.is_authenticated %}
                 var productId = button.getAttribute('data-product-id');
                 var xhr = new XMLHttpRequest();
                 xhr.open('POST', '/cart');
@@ -70,10 +75,10 @@
                   alert('An error occurred. Please try again.');
                 };
                 xhr.send(data);
-              });
+              {% endif %}
             });
           });
-          
+        });
       </script>
       
 </body>
