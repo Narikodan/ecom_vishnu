@@ -51,7 +51,10 @@
                    {{product_object.description}}
                 </p>
                 <p class="product-price text-center">₹{{product_object.price}}</p>
-                <button class="btn btn-primary btn-buy">Buy Now</button>
+                <form action="{% url 'myapp:buynow' product_object.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary btn-buy">Buy Now</button>
+                </form>
                 <button class="btn btn-success btn-add-to-cart">Add to Cart</button>
             </div>
         </div>
