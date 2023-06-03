@@ -22,7 +22,6 @@
 
 <body>
   <!-- Navbar -->
-  
   {% include 'myapp/navbar.html' %}
   
   <!-- Banner -->
@@ -41,12 +40,14 @@
       <!-- Add more carousel items as needed -->
     </div>
   </div>
+  
   {% for message in success_message %}
-  <div class="alert alert-success">
+    <div class="alert alert-success">
       {{ message }}
-  </div>
+    </div>
   {% endfor %}
-<!-- Products Section -->
+  
+  <!-- Products Section -->
 <div class="container mt-4">
   <h2>Products</h2>
   <div class="row">
@@ -78,72 +79,56 @@
           </p>
         </div>        
         <div class="card-footer">
-          <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+          {% if user.is_authenticated %}
+            <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+          {% else %}
+            <a href="{% url 'myapp:login' %}" class="btn btn-primary">Add to Cart</a>
+          {% endif %}
           <form action="{% url 'myapp:buynow' product.id %}" method="POST">
             {% csrf_token %}
             <button type="submit" class="btn btn-success">Buy Now</button>
-        </form>
+          </form>
         </div>
       </div>
     </div>
     {% endfor %}
   </div>
 </div>
-<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-
-<script>
-  var csrftoken = '{{ csrf_token }}';
-</script>
-<style>
-  .product-image {
-    height: 200px; /* Adjust the height as needed */
-    width: 100%;
-    object-fit: contain;
-  }
-</style>
-
-<!-- Bootstrap JS -->
-
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<!-- Custom JavaScript -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var addToCartButtons = document.querySelectorAll('.add-to-cart');
     addToCartButtons.forEach(function(button) {
       button.addEventListener('click', function() {
-        var productId = button.getAttribute('data-product-id');
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/cart');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-        var data = 'product_id=' + encodeURIComponent(productId) + '&csrfmiddlewaretoken=' + encodeURIComponent(csrftoken);
-        xhr.onload = function() {
-          if (xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            if (response.status === 'success') {
-              button.textContent = 'Added to Cart';
-              button.setAttribute('disabled', 'disabled');
+        {% if user.is_authenticated %}
+          var productId = button.getAttribute('data-product-id');
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/cart');
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+          var data = 'product_id=' + encodeURIComponent(productId) + '&csrfmiddlewaretoken=' + encodeURIComponent(csrftoken);
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              var response = JSON.parse(xhr.responseText);
+              if (response.status === 'success') {
+                button.textContent = 'Added to Cart';
+                button.setAttribute('disabled', 'disabled');
+              }
+            } else {
+              alert('An error occurred. Please try again.');
             }
-          } else {
+          };
+          xhr.onerror = function() {
             alert('An error occurred. Please try again.');
-          }
-        };
-        xhr.onerror = function() {
-          alert('An error occurred. Please try again.');
-        };
-        xhr.send(data);
+          };
+          xhr.send(data);
+        {% endif %}
       });
     });
   });
-  
 </script>
 
-
-
-
+  
 </body>
 
 </html>
