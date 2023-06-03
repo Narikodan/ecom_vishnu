@@ -7,8 +7,14 @@
         <img src="https://w7.pngwing.com/pngs/882/672/png-transparent-shopify-e-commerce-logo-magento-sales-business-text-retail-people.png" alt="Company Logo" height="50">
     </a>
     <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      <div class="input-group">
+        <input class="form-control" type="search" name='item_name' placeholder="Search products..." aria-label="Search">
+        <div class="input-group-append">
+          <button class="btn btn-outline-success" type="submit">
+            <i class="fas fa-search" style="color: rgb(5, 8, 17);"></i>
+          </button>
+        </div>
+      </div>
     </form>
     <ul class="navbar-nav ml-auto">
       {% if user.is_authenticated and not user.is_superuser %}
