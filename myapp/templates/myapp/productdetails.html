@@ -4,26 +4,8 @@
     <title>Product Detail</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-        .product-images img {
-            max-width: 100%;
-            height: auto;
+        .button-container {
             margin-bottom: 20px;
-        }
-
-        .product-price {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        .product-description {
-            margin-bottom: 20px;
-        }
-
-        .btn-buy,
-        .btn-add-to-cart {
-            width: 100%;
-            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -50,15 +32,50 @@
                 <p class="product-description">
                    {{product_object.description}}
                 </p>
-                <p class="product-price text-center">₹{{product_object.price}}</p>
-                <form action="{% url 'myapp:buynow' product_object.id %}" method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary btn-buy">Buy Now</button>
-                </form>
-                <button class="btn btn-success btn-add-to-cart">Add to Cart</button>
+                <div class="button-container">
+                    <form action="{% url 'myapp:buynow' product_object.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary btn-block">Buy Now</button>
+                    </form>
+                    <button class="btn btn-success btn-block" data-product-id="{{ product_object.id }}">Add to Cart</button>
+                </div>
             </div>
         </div>
     </div>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          var addToCartButtons = document.querySelectorAll('.btn-success');
+          addToCartButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+              var productId = button.getAttribute('data-product-id');
+              var xhr = new XMLHttpRequest();
+              xhr.open('POST', '/cart');
+              xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+              var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+              var data = 'product_id=' + encodeURIComponent(productId) + '&csrfmiddlewaretoken=' + encodeURIComponent(csrftoken);
+              xhr.onload = function() {
+                if (xhr.status === 200) {
+                  var response = JSON.parse(xhr.responseText);
+                  if (response.status === 'success') {
+                    button.textContent = 'Added to Cart';
+                    button.setAttribute('disabled', 'disabled');
+                    alert(response.message);
+                  } else {
+                    alert(response.message);
+                  }
+                } else {
+                  alert('An error occurred. Please try again.');
+                }
+              };
+              xhr.onerror = function() {
+                alert('An error occurred. Please try again.');
+              };
+              xhr.send(data);
+            });
+          });
+        });
+    </script>
 </body>
 </html>
