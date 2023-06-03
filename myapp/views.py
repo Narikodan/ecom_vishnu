@@ -19,22 +19,37 @@ def index(request):
     return render(request, 'myapp/index.html', {'success_message': success_message, 'first_name': first_name, 'products': products})
 
 
+
+
 def register(request):
     User = get_user_model()
     if request.method == 'POST':
+        # Retrieve form data
         first_name = request.POST.get('first_name', '')
         last_name = request.POST.get('last_name', '')
         mobile_number = request.POST.get('mobile_number', '')
         password = request.POST.get('password', '')
         username = request.POST.get('username', '')
-        user = User.objects.create_user(first_name=first_name, last_name=last_name, mobile_number=mobile_number,
-                                        password=password, username=username)
-        messages.success(request, 'User created successfully!')
-        return redirect('myapp:index')
+
+        # Validate form data
+        if not first_name or not last_name or not mobile_number or not password or not username:
+            messages.error(request, 'Please fill in all fields.')
+        elif User.objects.filter(mobile_number=mobile_number).exists():
+            messages.error(request, 'Mobile number is already registered.')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Username is already taken.')
+        else:
+            # Create user
+            user = User.objects.create_user(first_name=first_name, last_name=last_name, mobile_number=mobile_number,
+                                            password=password, username=username)
+            messages.success(request, 'User created successfully!')
+            return redirect('myapp:index')
+
     return render(request, 'myapp/register.html')
 
 
-from django.contrib import messages
+
+
 
 def login_view(request):
     if request.method == 'POST':
