@@ -46,36 +46,35 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-          var addToCartButtons = document.querySelectorAll('.btn-success');
-          addToCartButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-              var productId = button.getAttribute('data-product-id');
-              var xhr = new XMLHttpRequest();
-              xhr.open('POST', '/cart');
-              xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-              var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-              var data = 'product_id=' + encodeURIComponent(productId) + '&csrfmiddlewaretoken=' + encodeURIComponent(csrftoken);
-              xhr.onload = function() {
-                if (xhr.status === 200) {
-                  var response = JSON.parse(xhr.responseText);
-                  if (response.status === 'success') {
-                    button.textContent = 'Added to Cart';
-                    button.setAttribute('disabled', 'disabled');
-                    alert(response.message);
+            var addToCartButtons = document.querySelectorAll('.btn-success');
+            addToCartButtons.forEach(function(button) {
+              button.addEventListener('click', function() {
+                var productId = button.getAttribute('data-product-id');
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/cart');
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                var data = 'product_id=' + encodeURIComponent(productId) + '&csrfmiddlewaretoken=' + encodeURIComponent(csrftoken);
+                xhr.onload = function() {
+                  if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.status === 'success') {
+                      button.textContent = 'Added to Cart';
+                      button.setAttribute('disabled', 'disabled');
+                    }
                   } else {
-                    alert(response.message);
+                    alert('An error occurred. Please try again.');
                   }
-                } else {
+                };
+                xhr.onerror = function() {
                   alert('An error occurred. Please try again.');
-                }
-              };
-              xhr.onerror = function() {
-                alert('An error occurred. Please try again.');
-              };
-              xhr.send(data);
+                };
+                xhr.send(data);
+              });
             });
           });
-        });
-    </script>
+          
+      </script>
+      
 </body>
 </html>

@@ -34,6 +34,8 @@ def register(request):
     return render(request, 'myapp/register.html')
 
 
+from django.contrib import messages
+
 def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -43,10 +45,9 @@ def login_view(request):
             login(request, user)
             return redirect('myapp:index')
         else:
-            error_message = 'Invalid credentials'
-    else:
-        error_message = None
-    return render(request, 'myapp/login.html', {'error_message': error_message})
+            messages.error(request, 'Invalid credentials')
+    return render(request, 'myapp/login.html')
+
 
 
 def logout_view(request):

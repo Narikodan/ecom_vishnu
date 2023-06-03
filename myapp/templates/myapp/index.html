@@ -126,9 +126,6 @@
             if (response.status === 'success') {
               button.textContent = 'Added to Cart';
               button.setAttribute('disabled', 'disabled');
-              alert(response.message);
-            } else {
-              alert(response.message);
             }
           } else {
             alert('An error occurred. Please try again.');
@@ -141,6 +138,7 @@
       });
     });
   });
+  
 </script>
 
 
