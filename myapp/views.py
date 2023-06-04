@@ -46,6 +46,7 @@ def register(request):
             user = User.objects.create_user(first_name=first_name, last_name=last_name, mobile_number=mobile_number,
                                             password=password, username=username)
             messages.success(request, 'User created successfully!')
+            login(request, user)  # Log in the user
             return redirect('myapp:index')
 
     return render(request, 'myapp/register.html')

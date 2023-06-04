@@ -61,13 +61,17 @@
             </div>
         </div>
         
-        <form action="/process_checkout" method="POST">
+        
+            {% csrf_token %}
             <!-- Your remaining checkout form fields here -->
             <!-- For example, payment details, order summary, etc. -->
             <div class="text-center">
+                <form action="{% url 'myapp:paymentoption' %}" method="POST">
+                    {% csrf_token %}
                 <button type="submit" class="btn btn-primary">Place Order</button>
+            </form>
             </div>
-        </form>
+        
     </div>
 </body>
 </html>
