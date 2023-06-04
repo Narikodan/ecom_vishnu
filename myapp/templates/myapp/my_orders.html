@@ -1,0 +1,48 @@
+{% include 'myapp/navbar.html' %}
+  <h1>My Orders</h1>
+
+  {% if user_orders %}
+    {% for user_order in user_orders %}
+      <div class="order">
+        <h3>Order #{{ user_order.pk }}</h3>
+        <p>Date: {{ user_order.created_at }}</p>
+        <p>Total Amount: {{ user_order.total_amount }}</p>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order_item in user_order.orderitem_set.all %}
+              <tr>
+                <td>
+                  <img src="{{ order_item.product.image_url_1 }}" alt="{{ order_item.product.name }}" width="100" height="100">
+                  {{ order_item.product.name }}
+                </td>
+                <td>{{ order_item.quantity }}</td>
+                <td>{{ order_item.product.price }}</td>
+                
+              </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" class="text-end"><strong>Total</strong></td>
+              <td>{{ user_order.total_amount }}</td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <h4>Tracking Details</h4>
+        <p>Tracking ID: {{ user_order.pk }}</p>
+        <p>Expected Delivery Date: {{ user_order.created_at|date:'Y-m-d' }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p>No orders found.</p>
+  {% endif %}

@@ -1,0 +1,30 @@
+{% include 'myapp/navbar.html' %}
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card text-center">
+    <div class="card-header">
+      <h3>Payment Details</h3>
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">Payment Method: {{ payment_method }}</h5>
+      <p class="card-text">Total Amount: {{ amount }}</p>
+
+      <!-- Razorpay payment processing form -->
+      <form id="paymentForm" action="{% url 'myapp:payment_process' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="payment_method" value="{{ payment_method }}">
+        <input type="hidden" name="amount" value="{{ amount }}">
+        <script src="https://checkout.razorpay.com/v1/checkout.js" data-key="{{ order.key }}" data-amount="{{ amount }}" data-currency="INR" data-order_id="{{ order.id }}" data-buttontext="Pay with Razorpay" data-name="Your Store" data-description="Payment for Order" data-prefill.name="{{ order.billing_address.name }}" data-prefill.email="{{ order.billing_address.email }}" data-prefill.contact="{{ order.billing_address.phone }}" data-theme.color="#F37254"></script>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Submit the form when the Razorpay checkout is completed
+  var form = document.getElementById('paymentForm');
+  form.addEventListener('checkout.success', function (e) {
+    form.submit();
+  });
+</script>
+
