@@ -177,3 +177,7 @@ def buynow(request, id):
     except ShippingAddress.DoesNotExist:
         return redirect('myapp:edit_adress')
     return render(request, 'myapp/buynow.html', {'product_object': product_object, 'shipping_address': shipping_address})
+
+@login_required
+def paymentoption(request):
+    return render (request, 'myapp/paymentoption.html')

@@ -1,0 +1,55 @@
+{% include 'myapp/navbar.html' %}
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <form action="" method="post" class="text-center">
+    {% csrf_token %}
+    
+    <h3 class="mb-4 display-4">Select Payment Method:</h3>
+    
+    <table class="table table-borderless">
+      <tbody>
+        <tr>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="credit_card" name="payment_method" value="credit_card">
+              <label class="form-check-label" for="credit_card" style="font-size: 24px;">Credit Card</label>
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="debit_card" name="payment_method" value="debit_card">
+              <label class="form-check-label" for="debit_card" style="font-size: 24px;">Debit Card</label>
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="net_banking" name="payment_method" value="net_banking">
+              <label class="form-check-label" for="net_banking" style="font-size: 24px;">Net Banking</label>
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="upi" name="payment_method" value="upi">
+              <label class="form-check-label" for="upi" style="font-size: 24px;">UPI</label>
+            </div>
+          </td>
+        </tr>
+        
+        <tr>
+          <td>
+            <button type="submit" class="btn btn-primary" style="font-size: 28px;">Proceed to Payment</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
