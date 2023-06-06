@@ -1,0 +1,42 @@
+<!-- payment.html -->
+<html>
+<head>
+    <title>Razorpay Payment</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+    <h1>Make a Payment</h1>
+    <form id="paymentForm" action="{% url 'myapp:payment_success' %}" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="razorpay_order_id" value="{{ razorpay_order_id }}">
+        <input type="hidden" id="razorpay_payment_id" name="razorpay_payment_id" value="">
+        <input type="hidden" id="razorpay_signature" name="razorpay_signature" value="">
+        <input type="hidden" name="amount" value="{{ amount }}">
+        <script>
+            var options = {
+                key: "{{ razorpay_key }}",
+                amount: "{{ amount }}",
+                name: "Your Company Name",
+                description: "Order Payment",
+                image: "https://your-company-logo.png",
+                order_id: "{{ razorpay_order_id }}",
+                handler: function (response) {
+                    // Set the payment ID and signature values
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_signature').value = response.razorpay_signature;
+
+                    // Submit the form
+                    document.getElementById('paymentForm').submit();
+                },
+                prefill: {
+                    name: "John Doe",
+                    email: "john@example.com",
+                    contact: "+919876543210"
+                }
+            };
+            var rzp = new Razorpay(options);
+            rzp.open();
+        </script>
+    </form>
+</body>
+</html>

@@ -199,117 +199,120 @@ def checkout(request):
     return HttpResponseRedirect(reverse('myapp:paymentoption'))
 
 
-@login_required
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Cart, UserOrder, OrderItem
+import razorpay
+from django.conf import settings
+from django.views.decorators.http import require_POST
+import hashlib
+from django.views.decorators.csrf import csrf_exempt
+
+from django.conf import settings
+from django.shortcuts import render
+import razorpay
+
 def paymentoption(request):
-    print("Inside paymentoption view")
+    # Calculate total cart amount
+    cart_items = Cart.objects.filter(user=request.user)
+    total_amount = sum(item.product.price * item.quantity for item in cart_items)
 
-    # Get the total amount from the session or calculate it from the user's cart
-    total_amount = request.session.get('total_amount')
-    if not total_amount:
-        # Calculate the total amount from the user's cart
-        cart_items = Cart.objects.filter(user=request.user)
-        total_amount = sum(item.product.price * item.quantity for item in cart_items)
+    # Generate the Razorpay order amount (in paise)
+    order_amount = int(total_amount * 100)
 
-    # Create a Razorpay client instance
+    # Create a Razorpay order
     client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
-
-    # Create an order on Razorpay
-    order_amount = int(float(total_amount) * 100)  # Convert the amount to paise (Razorpay uses paise as the unit)
-    order_currency = 'INR'  # Set the currency to Indian Rupees (INR)
-    order_receipt = 'order_{}'.format(request.user.id)  # Generate a unique order receipt for each user
-
-    # Prepare the order details
-    order_data = {
+    data = {
         'amount': order_amount,
-        'currency': order_currency,
-        'receipt': order_receipt,
-        'payment_capture': 1,  # Capture the payment immediately
+        'currency': 'INR',
+        # Other order details if needed
     }
+    razorpay_order = client.order.create(data=data)
 
-    # Create the order on Razorpay
-    order = client.order.create(data=order_data)
-
-    # Extract the order ID from the response
-    order_id = order.get('id')
-
-    # Pass the order ID and total amount to the template
     context = {
-        'razorpay_api_key': settings.RAZORPAY_API_KEY,
-        'razorpay_order_id': order_id,
+        'razorpay_order_id': razorpay_order['id'],
+        'razorpay_key': settings.RAZORPAY_API_KEY,
+        'order_amount': order_amount,
         'total_amount': total_amount,
     }
 
+    return render(request, 'myapp/payment.html', context)
+
+
+from .models import UserOrder, OrderItem
+
+
+
+import razorpay
+
+from django.shortcuts import redirect
+
+def payment_success(request):
     if request.method == 'POST':
-        print("Processing POST request")
-
-        # Check if the payment is successful
         payment_id = request.POST.get('razorpay_payment_id')
-        signature = request.POST.get('razorpay_signature')
+        razorpay_order_id = request.POST.get('razorpay_order_id')
+        razorpay_signature = request.POST.get('razorpay_signature')
 
-        params_dict = {
-            'razorpay_order_id': order_id,
-            'razorpay_payment_id': payment_id,
-            'razorpay_signature': signature
-        }
+        print("Payment ID:", payment_id)
+        print("Razorpay Order ID:", razorpay_order_id)
+        print("Razorpay Signature:", razorpay_signature)
+
+        client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
 
         try:
             # Verify the payment signature
+            params_dict = {
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': razorpay_signature,
+            }
+            print("Params Dict:", params_dict)
             client.utility.verify_payment_signature(params_dict)
-            print("Payment signature verified")
+            print("Signature verification successful")
 
-
-            # Payment is successful
-            # Create a UserOrder object
-            user_order = UserOrder.objects.create(
-                user=request.user,
-                total_amount=total_amount,
-            )
-            
-            print("UserOrder created:", user_order)
-
-            # Move cart items to UserOrder
+            # Payment signature is valid
+            # Move items from cart to UserOrder
             cart_items = Cart.objects.filter(user=request.user)
+            total_amount = 0
+
+            # Create UserOrder and OrderItem for each cart item
+            user_order = UserOrder.objects.create(user=request.user, total_amount=0)
+            order_items = []
             for cart_item in cart_items:
-                order_item = OrderItem.objects.create(
-                    order=user_order,
-                    product=cart_item.product,
-                    quantity=cart_item.quantity,
-                )
-                print("OrderItem created:", order_item)
+                order_item = OrderItem.objects.create(order=user_order, product=cart_item.product, quantity=cart_item.quantity)
+                total_amount += cart_item.product.price * cart_item.quantity
+                order_items.append(order_item)
 
-            # Delete cart items
+            # Update the total amount in UserOrder
+            user_order.total_amount = total_amount
+            user_order.save()
+
+            # Clean the user's cart
             cart_items.delete()
+            print("Cart items deleted successfully")
 
-            # Pass the order ID, total amount, and user order ID to the template
-            context['user_order_id'] = user_order.pk
-            context['payment_successful'] = True
-
-            # Redirect to my_orders page
+            # Redirect to the My Orders page
             return redirect('myapp:my_orders')
 
         except razorpay.errors.SignatureVerificationError:
-            print("Signature verification failed")
+            # Payment signature is invalid
+            # Handle the error as needed
+            print("Signature verification error: Razorpay Signature Verification Failed")
 
-            # Payment verification failed
-            context['payment_successful'] = False
+    # Handle the case if the request is not a POST request or payment signature verification fails
+    # Redirect to an error page or display an error message
+    print("Redirecting to payment_failed page")
+    return redirect('myapp:payment_failed')
 
-    # Render the paymentoption.html template with the data
-    return render(request, 'myapp/paymentoption.html', context)
 
-
-@login_required
+    
 def my_orders(request):
     # Retrieve the user's orders
     user_orders = UserOrder.objects.filter(user=request.user)
 
-    # Calculate the total for each order item
-    for user_order in user_orders:
-        order_items = user_order.orderitem_set.all()
-        for order_item in order_items:
-            order_item.total = order_item.quantity * order_item.product.price
-
     context = {
-        'user_orders': user_orders,
+        'user_orders': user_orders
     }
 
     return render(request, 'myapp/my_orders.html', context)
+
