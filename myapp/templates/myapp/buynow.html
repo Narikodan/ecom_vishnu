@@ -9,27 +9,27 @@
     <div class="container">
         <h1>Checkout</h1>
         
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Buy Now</h5>
-                </div>
-                <div class="card-body">
-                    <div class="cart-items">
-                            <div class="row cart-item">
-                                <div class="col-md-2">
-                                    <img src="{{product_object.image_url_1}}" alt="Product Image" class="img-fluid">
-                                </div>
-                                <div class="col-md-3">
-                                    <p>{{product_object.name}}</p>
-                                </div>
-                                <div class="col-md-2">
-                                    <p>₹{{product_object.price}}</p>
-                                </div>
-                                <!-- Other cart item details -->
-                            </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Buy Now</h5>
+            </div>
+            <div class="card-body">
+                <div class="cart-items">
+                    <div class="row cart-item">
+                        <div class="col-md-2">
+                            <img src="{{ product_object.image_url_1 }}" alt="Product Image" class="img-fluid">
+                        </div>
+                        <div class="col-md-3">
+                            <p>{{ product_object.name }}</p>
+                        </div>
+                        <div class="col-md-2">
+                            <p>₹{{ product_object.price }}</p>
+                        </div>
+                        <!-- Other cart item details -->
                     </div>
                 </div>
             </div>
+        </div>
         
         <div class="card mb-4">
             <div class="card-header">
@@ -38,12 +38,12 @@
             <div class="card-body">
                 {% if shipping_address %}
                     <div id="address-info">
-                        <p><strong> {{ shipping_address.name }}</strong></p>
-                        <p><strong> {{ shipping_address.address }}</strong></p>
-                        <p><strong> {{ shipping_address.city }}</strong></p>
-                        <p><strong> {{ shipping_address.state }}</strong></p>
-                        <p><strong> {{ shipping_address.pin_code }}</strong></p>
-                        <p><strong> {{ shipping_address.phone }}</strong></p>
+                        <p><strong>{{ shipping_address.name }}</strong></p>
+                        <p><strong>{{ shipping_address.address }}</strong></p>
+                        <p><strong>{{ shipping_address.city }}</strong></p>
+                        <p><strong>{{ shipping_address.state }}</strong></p>
+                        <p><strong>{{ shipping_address.pin_code }}</strong></p>
+                        <p><strong>{{ shipping_address.phone }}</strong></p>
                     </div>
                 {% else %}
                     <p>No shipping address found.</p>
@@ -55,15 +55,14 @@
             </div>
         </div>
         
-       
-            <!-- Your remaining checkout form fields here -->
-            <!-- For example, payment details, order summary, etc. -->
-            <div class="text-center">
-                <form action="{% url 'myapp:paymentoption' %}" method="POST">
-                    {% csrf_token %}
+        <div class="text-center">
+            <form action="{% url 'myapp:paymentoption' %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="product_id" value="{{ product_object.id }}">
+                <input type="hidden" name="total_amount" value="{{ product_object.price }}">
                 <button type="submit" class="btn btn-primary">Place Order</button>
             </form>
-            </div>
+        </div>
         
     </div>
 </body>

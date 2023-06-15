@@ -15,6 +15,7 @@ from myapp.models import UserOrder, OrderItem
 
 
 
+
 def index(request):
     success_message = messages.get_messages(request)
     products = Product.objects.all()
@@ -145,6 +146,11 @@ def productdetails(request, id):
 
 @login_required
 def edit_adress(request):
+    shipping_address = None
+    try:
+        shipping_address = ShippingAddress.objects.get(user=request.user)
+    except ShippingAddress.DoesNotExist:
+        shipping_address = None
     if request.method == 'POST':
         name = request.POST.get('name')
         address = request.POST.get('address')
@@ -165,38 +171,54 @@ def edit_adress(request):
 
         return redirect('myapp:checkout')
 
-    return render(request, 'myapp/shippingaddress.html')
+    return render(request, 'myapp/shippingaddress.html' , {'shipping_address': shipping_address})
+
+from django.shortcuts import redirect
 
 @login_required
 def buynow(request, id):
     product_object = Product.objects.get(id=id)
     user = request.user
+    
     try:
         shipping_address = ShippingAddress.objects.get(user=user)
     except ShippingAddress.DoesNotExist:
-        return redirect('myapp:edit_adress')
+        return redirect('myapp:edit_address', address=shipping_address.id)
     return render(request, 'myapp/buynow.html', {'product_object': product_object, 'shipping_address': shipping_address})
 
-from decimal import Decimal
 
-from django.urls import reverse
 
 @login_required
 def checkout(request):
     user = request.user
-    try:
-        shipping_address = ShippingAddress.objects.get(user=user)
-    except ShippingAddress.DoesNotExist:
-        return redirect('myapp:edit_address')
 
-    cart_items = Cart.objects.filter(user=user)
-    total_amount = cart_items.aggregate(total=Sum('product__price'))['total']
+    # Check if the user is coming from the "buynow" page
+    if 'buynow_product_id' in request.session:
+        product_id = request.session['buynow_product_id']
+        try:
+            product = Product.objects.get(id=product_id)
+            total_amount = product.price
+        except Product.DoesNotExist:
+            return redirect('myapp:home')  # Redirect to home if the product doesn't exist
+    else:
+        # User is coming from the regular cart
+        try:
+            shipping_address = ShippingAddress.objects.get(user=user)
+        except ShippingAddress.DoesNotExist:
+            return redirect('myapp:edit_address')
+
+        cart_items = Cart.objects.filter(user=user)
+        total_amount = cart_items.aggregate(total=Sum('product__price'))['total']
 
     # Convert the total amount to float before storing it in the session
     request.session['total_amount'] = str(total_amount)
 
+    # Clear the session variable for buynow product ID
+    request.session.pop('buynow_product_id', None)
+
     # Redirect to the payment option view
     return HttpResponseRedirect(reverse('myapp:paymentoption'))
+
 
 
 from django.shortcuts import render, redirect
