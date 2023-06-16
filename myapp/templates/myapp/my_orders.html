@@ -1,13 +1,12 @@
 {% include 'myapp/navbar.html' %}
 
 <div class="container">
-  <h1 class="text-center">My Orders</h1>
+  <h1 class="text-center text-success">My Orders</h1>
 
   {% if user_orders %}
     {% for user_order in user_orders reversed %}
-      <div class="card mx-auto mb-4" style="width: 600px;">
-        <div class="card-header">
-          
+      <div class="card mx-auto mb-4" style="max-width: 600px;">
+        <div class="card-header bg-success text-white">
           <p class="card-subtitle">Date: {{ user_order.created_at }}</p>
           <p class="card-subtitle">Total Amount: {{ user_order.total_amount }}</p>
         </div>
@@ -27,9 +26,9 @@
                   <tr>
                     <td>
                       <div class="media">
-                        <img src="{{ order_item.product.image_url_1 }}" alt="{{ order_item.product.name }}" class="mr-3" width="100" height="100">
+                        <img src="{{ order_item.product.image_url_1 }}" alt="{{ order_item.product.name }}" class="mr-3 img-thumbnail" width="100" height="100">
                         <div class="media-body">
-                          <h5 class="mt-0">{{ order_item.product.name }}</h5>
+                          <h5 class="mt-0 text-success">{{ order_item.product.name }}</h5>
                         </div>
                       </div>
                     </td>
@@ -47,13 +46,13 @@
               </tfoot>
             </table>
           </div>
-          <h4>Tracking Details</h4>
-          <p>Tracking ID: {{ user_order.pk }}</p>
-          <p>Expected Delivery Date: {{ user_order.created_at|date:'Y-m-d' }}</p>
+          <h4 class="text-success">Tracking Details</h4>
+          <p class="text-success">Tracking ID: {{ user_order.pk }}</p>
+          <p class="text-success">Expected Delivery Date: {{ user_order.created_at|date:'Y-m-d' }}</p>
         </div>
       </div>
     {% endfor %}
   {% else %}
-    <p class="text-center">No orders found.</p>
+    <p class="text-center text-danger">No orders found.</p>
   {% endif %}
 </div>

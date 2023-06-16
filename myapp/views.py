@@ -175,6 +175,8 @@ def edit_adress(request):
 
 from django.shortcuts import redirect
 
+from django.core.exceptions import ObjectDoesNotExist
+
 @login_required
 def buynow(request, id):
     product_object = Product.objects.get(id=id)
@@ -183,7 +185,10 @@ def buynow(request, id):
     try:
         shipping_address = ShippingAddress.objects.get(user=user)
     except ShippingAddress.DoesNotExist:
-        return redirect('myapp:edit_address', address=shipping_address.id)
+        # Handle the case where ShippingAddress does not exist
+        # For example, redirect the user to a page to add their shipping address
+        return redirect('myapp:edit_adress')
+    
     return render(request, 'myapp/buynow.html', {'product_object': product_object, 'shipping_address': shipping_address})
 
 
@@ -205,7 +210,7 @@ def checkout(request):
         try:
             shipping_address = ShippingAddress.objects.get(user=user)
         except ShippingAddress.DoesNotExist:
-            return redirect('myapp:edit_address')
+            return redirect('myapp:edit_adress')
 
         cart_items = Cart.objects.filter(user=user)
         total_amount = cart_items.aggregate(total=Sum('product__price'))['total']

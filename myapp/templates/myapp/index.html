@@ -10,104 +10,118 @@
   <!-- Custom CSS -->
   <style>
     #banner img {
-      height: 90px; /* Adjust the width as needed */
+      height: 90px;
       width: 100%;
     }
-    #companylogo img{
+
+    #companylogo img {
       border-radius: 50%;
     }
+
+    .custom-button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .add-to-cart {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+
+    .add-to-cart:hover {
+      background-color: #0069d9;
+      border-color: #0062cc;
+    }
+
+    .buy-now {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .buy-now:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
   </style>
-  
 </head>
 
 <body>
   <!-- Navbar -->
   {% include 'myapp/navbar.html' %}
-  
-  <!-- Banner -->
-  <div id="banner" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="https://www.mytokri.com/out/?url=https://images-eu.ssl-images-amazon.com/images/G/31/img20/Events/revisedT2/Header_PC_Teaser-2_English.jpg" alt="Banner Image 1">
-        <div class="carousel-caption">
-        </div>
-      </div>
-      <div class="carousel-item">
-        <img src="https://i0.wp.com/www.eastmojo.com/wp-content/uploads/2021/10/Amazon-Great-India-Festival.jpg?fit=1200%2C400&ssl=1" alt="Banner Image 2">
-        <div class="carousel-caption">
-        </div>
-      </div>
-      <!-- Add more carousel items as needed -->
-    </div>
-  </div>
-  
-  {% for message in success_message %}
-    <div class="alert alert-success">
-      {{ message }}
-    </div>
-  {% endfor %}
-  
-  <!-- Products Section -->
-<div class="container mt-4">
-  <h2>Products</h2>
-  <div class="row">
-    {% for product in products %}
-    <div class="col-md-3">
-      <div class="card h-100">
-        <div id="carousel-products-{{ product.id }}" class="carousel slide" data-ride="carousel">
-          <a href="/{{product.id}}">
-            <div class="carousel-inner">
-              <div class="carousel-item active">
-                <img src="{{ product.image_url_1 }}" class="d-block w-100" alt="Product Image 1" style="max-height: 200px; object-fit: contain;">
-              </div>
-              <div class="carousel-item">
-                <img src="{{ product.image_url_2 }}" class="d-block w-100" alt="Product Image 2" style="max-height: 200px; object-fit: contain;">
-              </div>
-              <div class="carousel-item">
-                <img src="{{ product.image_url_3 }}" class="d-block w-100" alt="Product Image 3" style="max-height: 200px; object-fit: contain;">
-              </div>
-            </div>
-          </a>
-          <!-- Add carousel controls if needed -->
-        </div>
-        <div class="card-body">
-          <h5 class="card-title" style="font-style: italic;">{{ product.name }}</h5>
-        </div>
-        <div class="card-footer border-0 bg-transparent">
-          <p class="card-text mb-0">
-            <span style="font-weight: bold; font-style: italic; font-size: 25px; color:rgb(39, 37, 37)">₹{{ product.price }}</span>
-          </p>
-        </div>        
-        <div class="card-footer">
-          {% if user.is_authenticated %}
-            <button class="btn btn-primary add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
-          {% else %}
-            <a href="{% url 'myapp:login' %}" class="btn btn-primary">Add to Cart</a>
-          {% endif %}
-          <form action="{% url 'myapp:buynow' product.id %}" method="POST">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-success">Buy Now</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var addToCartButtons = document.querySelectorAll('.add-to-cart');
-    addToCartButtons.forEach(function(button) {
-      button.addEventListener('click', function() {
-        {% if user.is_authenticated %}
+
+  {% for message in success_message %}
+  <div class="alert alert-success">
+    {{ message }}
+  </div>
+  {% endfor %}
+
+  <!-- Products Section -->
+  <div class="container mt-4">
+    <h2>Products</h2>
+    <div class="row card-deck">
+      {% for product in products %}
+      <div class="col-md-3">
+        <div class="card h-100">
+          <div id="carousel-products-{{ product.id }}" class="carousel slide" data-ride="carousel">
+            <a href="/{{product.id}}">
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="{{ product.image_url_1 }}" class="card-img-top" alt="Product Image 1"
+                    style="max-height: 200px; object-fit: contain;">
+                </div>
+                <div class="carousel-item">
+                  <img src="{{ product.image_url_2 }}" class="card-img-top" alt="Product Image 2"
+                    style="max-height: 200px; object-fit: contain;">
+                </div>
+                <div class="carousel-item">
+                  <img src="{{ product.image_url_3 }}" class="card-img-top" alt="Product Image 3"
+                    style="max-height: 200px; object-fit: contain;">
+                </div>
+              </div>
+            </a>
+            <!-- Add carousel controls if needed -->
+          </div>
+          <div class="card-body">
+            <h5 class="card-title" style="font-style: italic;">{{ product.name }}</h5>
+          </div>
+          <div class="card-footer border-0 bg-transparent">
+            <p class="card-text mb-0">
+              <span style="font-weight: bold; font-style: italic; font-size: 25px; color:rgb(39, 37, 37)">₹{{ product.price }}</span>
+            </p>
+          </div>
+          <div class="card-footer">
+            {% if user.is_authenticated %}
+            <button class="btn btn-primary custom-button add-to-cart" data-product-id="{{ product.id }}">Add to Cart</button>
+            {% else %}
+            <a href="{% url 'myapp:login' %}" class="btn btn-primary custom-button">Add to Cart</a>
+            {% endif %}
+            <form action="{% url 'myapp:buynow' product.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success custom-button buy-now">Buy Now</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var addToCartButtons = document.querySelectorAll('.add-to-cart');
+      addToCartButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          {% if user.is_authenticated %}
           var productId = button.getAttribute('data-product-id');
           var xhr = new XMLHttpRequest();
           xhr.open('POST', '/cart');
           xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
           var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
           var data = 'product_id=' + encodeURIComponent(productId) + '&csrfmiddlewaretoken=' + encodeURIComponent(csrftoken);
-          xhr.onload = function() {
+          xhr.onload = function () {
             if (xhr.status === 200) {
               var response = JSON.parse(xhr.responseText);
               if (response.status === 'success') {
@@ -118,17 +132,16 @@
               alert('An error occurred. Please try again.');
             }
           };
-          xhr.onerror = function() {
+          xhr.onerror = function () {
             alert('An error occurred. Please try again.');
           };
           xhr.send(data);
-        {% endif %}
+          {% endif %}
+        });
       });
     });
-  });
-</script>
+  </script>
 
-  
 </body>
 
 </html>
